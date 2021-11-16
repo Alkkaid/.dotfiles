@@ -53,8 +53,6 @@ editor = os.getenv("EDITOR") or "nvim"
 editor_cmd = terminal .. " -e " .. editor
 local browser = "brave"
 
-local cpu_widget = require("awesome-wm-widgets.cpu-widget.cpu-widget")
-
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
 -- If you do not like this or do not have such a key,
@@ -204,7 +202,6 @@ s.mywibox:setup {
         layout = wibox.layout.fixed.horizontal,
         mykeyboardlayout,
         wibox.widget.systray(),
-    cpu_widget(),
         mytextclock,
         s.mylayoutbox,
     },
