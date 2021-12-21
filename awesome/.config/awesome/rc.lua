@@ -47,18 +47,42 @@ end
 -- Themes define colours, icons, font and wallpapers.
 beautiful.init(gears.filesystem.get_themes_dir() .. "default/theme.lua")
 
--- This is used later as the default terminal and editor to run.
-terminal = "alacritty"
-editor = os.getenv("EDITOR") or "nvim"
-editor_cmd = terminal .. " -e " .. editor
+local themes = {
+    "powerarrow-blue" -- 1
+}
+
+-- choose your theme here
+local chosen_theme = themes[1]
+local theme_path = string.format("%s/.config/awesome/themes/%s/theme.lua", os.getenv("HOME"), chosen_theme)
+-- beautiful.init(theme_path)
+
+
+
+
+-- personal variables
+local terminal = "alacritty"
 local browser = "brave"
+local editor = os.getenv("EDITOR") or "nvim"
+local filemanager = "thunar"
+
+-- This is used later as the default terminal and editor to run.
+editor_cmd = terminal .. " -e " .. editor
+
+-- Useless Gaps 
+beautiful.gap_single_client = true
+beautiful.useless_gap = 4
+
+
 
 -- Default modkey.
 -- Usually, Mod4 is the key with a logo between Control and Alt.
 -- If you do not like this or do not have such a key,
 -- I suggest you to remap Mod4 to another key using xmodmap or other tools.
 -- However, you can use another modifier like Mod1, but it may interact with others.
-modkey = "Mod4"
+local modkey = "Mod4"
+
+local altkey = "Mod1"
+
 
 -- Table of layouts to cover with awful.layout.inc, order matters.
 awful.layout.layouts = {
@@ -229,20 +253,13 @@ awful.key({ modkey,           }, "Right",  awful.tag.viewnext,
 awful.key({ modkey,           }, "Escape", awful.tag.history.restore,
           {description = "go back", group = "tag"}),
 
-awful.key({ modkey,           }, "j",
-    function ()
-        awful.client.focus.byidx( 1)
-    end,
-    {description = "focus next by index", group = "client"}
-),
-awful.key({ modkey,           }, "k",
-    function ()
-        awful.client.focus.byidx(-1)
-    end,
-    {description = "focus previous by index", group = "client"}
-),
 awful.key({ modkey,           }, "w", function () mymainmenu:show() end,
           {description = "show main menu", group = "awesome"}),
+
+-- Screenshots
+awful.key({ }, "Print", function () awful.util.spawn("scrot 'ArchLinux-%Y-%m-%d-%s_screenshot_$wx$h.jpg' -e 'mv $f $$(xdg-user-dir PICTURES)'") end,
+        {description = "Scrot", group = "screenshots"}),
+
 
 -- Layout manipulation
 awful.key({ modkey, "Shift"   }, "j", function () awful.client.swap.byidx(  1)    end,
@@ -264,6 +281,48 @@ awful.key({ modkey,           }, "Tab",
     end,
     {description = "go back", group = "client"}),
 
+
+-- Default client focus
+awful.key({ altkey,           }, "j",
+    function ()
+        awful.client.focus.byidx( 1)
+    end,
+    {description = "focus next by index", group = "client"}
+),
+awful.key({ altkey,           }, "k",
+    function ()
+        awful.client.focus.byidx(-1)
+    end,
+    {description = "focus previous by index", group = "client"}
+),
+
+-- By direction client focus
+awful.key({ modkey }, "j",
+    function()
+        awful.client.focus.global_bydirection("down")
+        if client.focus then client.focus:raise() end
+    end,
+    {description = "focus down", group = "client"}),
+awful.key({ modkey }, "k",
+    function()
+        awful.client.focus.global_bydirection("up")
+        if client.focus then client.focus:raise() end
+    end,
+    {description = "focus up", group = "client"}),
+awful.key({ modkey }, "h",
+    function()
+        awful.client.focus.global_bydirection("left")
+        if client.focus then client.focus:raise() end
+    end,
+    {description = "focus left", group = "client"}),
+awful.key({ modkey }, "l",
+    function()
+        awful.client.focus.global_bydirection("right")
+        if client.focus then client.focus:raise() end
+    end,
+    {description = "focus right", group = "client"}),
+
+
 -- Standard program
 awful.key({ modkey,           }, "Return", function () awful.spawn(terminal) end,
           {description = "open a terminal", group = "launcher"}),
@@ -273,9 +332,9 @@ awful.key({ modkey, "Shift"   }, "q", awesome.quit,
           {description = "quit awesome", group = "awesome"}),
 
 
-awful.key({ modkey,           }, "l",     function () awful.tag.incmwfact( 0.05)          end,
+awful.key({ altkey,  "Shift"  }, "l",     function () awful.tag.incmwfact( 0.05)          end,
           {description = "increase master width factor", group = "layout"}),
-awful.key({ modkey,           }, "h",     function () awful.tag.incmwfact(-0.05)          end,
+awful.key({ altkey,  "Shift"  }, "h",     function () awful.tag.incmwfact(-0.05)          end,
           {description = "decrease master width factor", group = "layout"}),
 awful.key({ modkey, "Shift"   }, "h",     function () awful.tag.incnmaster( 1, nil, true) end,
           {description = "increase the number of master clients", group = "layout"}),
@@ -482,7 +541,7 @@ awful.rules.rules = {
 
 -- Add titlebars to normal clients and dialogs
 { rule_any = {type = { "normal", "dialog" }
-  }, properties = { titlebars_enabled = true }
+  }, properties = { titlebars_enabled = false }
 },
 
 -- Set Brave to always map on the tag named "2" on screen 1.
